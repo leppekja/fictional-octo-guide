@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Spartan:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+    <title>DAFS Viz</title>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="https://donoradvisedfunds.info">Donor Advised Funds.info</a> 
+      <!-- <a href="/landingpage.html">Search</a> 
+      <a href="/landingpage.html#news-articles">News</a> 
+      <a href="#">2020 Report</a>
+      <a href="/landingpage.html">About</a>
+      <a href="/faq.html">About the Data</a> -->
+    </div>
+    <div class="grid">
+      <div class="search">
+        <div class="search_box">
+          <h2>Search a DAF</h2>
+          <!-- <form id="searchinput">
+          <input type="text" id="searchdaf" name="searchdaf">
+          <input type="button" value="Search" id="searchBtn"></button>
+          </form> -->
+          <div id="dropdown"></div>
+          <label for="dropdown">Search Organization Name</label>
+
+        </div>
+      </div>
+      <div class='infoBoxes'>
+        <div class="daf_info1" id="daf1">
+          <h3>None Selected</h3>
+        </div>
+        <div class="daf_info2" id="daf2">
+          <h3>None Selected</h3>
+        </div>
+        <div class="daf_info3" id="daf3">
+          <h3>None Selected</h3>
+        </div>
+      </div>
+      <div class="map">
+        <div id="mapviz"></div>
+      </div>
+      <div class="percent1" id="bar1">
+      </div>
+      <div class="percent2" id="bar2">
+      </div>
+      <div class="percent3" id="bar3">
+      </div>
+
+    </div>
+    <script src="bundle.js"></script>
+    <noscript>
+      <style type="text/css">
+          .grid {display:none;}
+      </style>
+      <div class="noscriptmsg">
+      This visualization requires Javascript to be enabled. 
+      </div>
+  </noscript>
+
+  <div id="test"></div>
+  </body>
+  <footer>
+    <a href="https://github.com/leppekja" class="social">
+        <i class="fa fa-github fa-2x fa-fw"></i>
+    </a>
+    <a href="mailto:leppekj@uchicago.edu" class="social">
+        <i class="fa fa-envelope-o fa-2x fa-fw"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/leppekja" class="social">
+        <i class="fa fa-linkedin fa-2x fa-fw"></i>
+    </a>
+  </footer>
+</html>
