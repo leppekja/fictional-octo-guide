@@ -1,0 +1,287 @@
+
+a {
+  cursor: pointer;
+}
+
+html {
+  font-family: 'Noto Sans JP', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color:lightgray;
+  padding:0;
+  padding-bottom:60px;
+}
+
+.contrast-font {
+  font-size: 18px;
+  font-family: 'Didact Gothic', Arial, sans-serif;
+  color: darkgree
+}
+
+h2 {
+  color: #003f5c;
+  margin: 5px;
+  font-weight: bold;
+}
+
+/* Navigation Bar CSS */
+.nav {
+  width: 100%;
+  background-color: #003f5c;
+  overflow: auto;
+}
+
+.nav a {
+  float: left;
+  padding: 12px;
+  color: white;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.nav a:hover {
+  border-right: 1px solid whitesmoke;
+  border-left: 1px solid whitesmoke;
+}
+
+/* Page Layout CSS */
+.grid {
+  display: grid;
+  grid-template-areas: 
+    'search map map map'
+    'dafBoxes map map map'
+    'dafBoxes percent1 percent2 percent3';    
+  grid-column-gap: 10px;
+  row-gap: 10px;
+}
+
+.search, .map, .percent, 
+.daf_info1, .daf_info2, .daf_info3 {
+  padding: 5px;
+  margin: 5px;
+}
+
+/* Search Box */
+
+.search {
+  grid-area: search;
+  max-width: 300px;
+  /* border: 2px solid orangered; */
+}
+
+.search_box {
+  border-radius: 4px;
+  padding: 5px;
+  margin: 1px;
+  background: whitesmoke;
+  box-shadow: 0 4px 8px 0  rgb(82, 82, 82);
+  word-wrap: break-word;
+
+}
+
+#dropdown {
+  word-wrap: break-word;
+}
+
+#DAFnames {
+  max-width: 270px;
+  word-wrap: break-word;
+}
+
+input[type=button] {
+  border: 1px solid darkgray;
+  border-radius: 3px;
+  background-color: lightgray;
+  max-width: 280px;
+}
+
+label {
+  display:block;
+  font-size: 9px;
+  line-height: 8px;
+}
+
+/* Map Visualization CSS */
+.map {
+  grid-area: map;
+  max-height: fit-content;
+  /* border: 2px solid orangered; */
+}
+
+circle {
+  z-index: 100; 
+}
+
+.percent1 {
+  grid-area: percent1;
+  max-width: 300px;
+  padding: 5px;
+  border-top:2px solid rgb(82, 82, 82);
+}
+.percent2 {
+  grid-area: percent2;
+  max-width: 300px;
+  padding: 5px;
+  border-top:2px solid rgb(82, 82, 82);
+
+}
+.percent3 {
+  grid-area: percent3;
+  max-width: 300px;
+  padding: 5px;
+  border-top:2px solid rgb(82, 82, 82);
+
+}
+
+#tooltip {
+  position:absolute;
+  pointer-events: none;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 5px;
+}
+
+/* Stacked Area Chart CSS */
+#compviz {
+  /* max-width: 200px; */
+  /* width:fit-content; */
+  border-right: 2px solid rgb(82, 82, 82)
+}
+
+/* DAF Info Boxes */
+.infoBoxes {
+  grid-area: dafBoxes;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+}
+#delete {
+  display: inline;
+  padding-right: 3px;
+}
+
+h5 {
+  line-height: .8em;
+}
+
+.daf_info1 {
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 5px 5px 10px;
+  background: whitesmoke;
+  box-shadow: 0 4px 8px 0 #003f5c;
+  height: fit-content;
+  border: 3px solid #003f5c;
+
+}
+
+.daf_info1 h3 {
+  color: #003f5c;
+  display: inline;
+}
+
+.daf_info2 {
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 5px 5px 10px;
+  background: whitesmoke;
+  box-shadow: 0 4px 8px 0 #cd853f;
+  height: fit-content;
+  border: 3px solid #cd853f;
+}
+
+.daf_info2 h3 {
+  color: #cd853f;
+  display: inline;
+}
+
+
+.daf_info3 {
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 5px 5px 10px;
+  background: whitesmoke;  
+  box-shadow: 0 4px 8px 0 #555555;
+  height: fit-content;
+  border: 3px solid #555555;
+
+}
+.daf_info3 h3 {
+  color: #133813;
+  display: inline;
+}
+
+/* Footer CSS */
+
+footer {
+  background: #003f5c;
+  margin: 0px;
+  height: 40px;
+  width:100%;
+  padding: 15px 0px 0px 0px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+}
+
+.social {
+  color: whitesmoke;
+  text-decoration: none;
+  text-shadow: 0px 0px 2px white;
+}
+
+.social:hover {
+  border-right: 1px solid gray;
+  border-left: 1px solid gray;
+}
+
+/* Responsive Display */
+@media screen and (max-width: 800px) {
+  .nav a {
+      float: none;
+      display: block;
+  }
+
+  .nav a:hover {
+      border-top: 1px solid whitesmoke;
+      border-bottom: 1px solid whitesmoke;
+      border-right: none;
+      border-left: none;
+  }
+
+  .search {
+    max-width: 100%;
+  }
+
+  .infoBoxes {
+    max-width: 100%;
+  }
+
+  .percent1 {
+    max-width: 100%;
+  }
+
+  .percent2 {
+    max-width: 100%;
+  }
+  
+  .percent3 {
+    max-width: 100%;
+  }
+
+  .grid {
+    grid-template-areas: 
+      'search'
+      'map'
+      'percent1'
+      'percent2'
+      'percent3'
+      'dafBoxes';
+  }
+}
