@@ -83,12 +83,12 @@ var svg = svgContainer
     .attr("fill", "none")
     .attr("stroke", "lightgray")
     .attr("d", geoPath().projection(projection));
-
+  console.log("loading next");
     // svg.call(zoom);
 
   csv('./data/TestGeocodeToJson.csv')
     .then(points => {
-      
+      console.log('Data Loaded');
       const points_margin ={top: -40, bottom: 0, right: 0, left: 100};
       // DROPDOWN
       var selecter = select("#dropdown")
