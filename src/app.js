@@ -86,7 +86,7 @@ var svg = svgContainer
 
     // svg.call(zoom);
 
-  csv('https://github.com/leppekja/fictional-octo-guide/tree/main/data')
+  csv('https://github.com/leppekja/fictional-octo-guide/blob/main/data/TestGeocodeToJson.csv')
     .then(points => {
       
       const points_margin ={top: -40, bottom: 0, right: 0, left: 100};
