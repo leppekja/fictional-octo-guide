@@ -83,7 +83,7 @@ var svg = svgContainer
     .attr("fill", "none")
     .attr("stroke", "lightgray")
     .attr("d", geoPath().projection(projection));
-
+  console.log("loading next");
     // svg.call(zoom);
 
   csv('./data/TestGeocodeToJson.csv')
