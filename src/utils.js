@@ -104,3 +104,28 @@ function nameChange(d) {
     return d;
   }
 }
+
+
+// Fix the parallel sets diagram y-values
+// For some reason, the Sankey object provides incorrect y-values and no width
+
+export function fixSankeyYVals(data, type) {
+  var sourceStart = 0;
+  var targetStart = 0;
+
+  if (type == "nodes") {
+    for (let i=0; i < data.length; i++) {
+      if (data[i]['layer'] == 0) {
+        data[i].y0 = sourceStart;
+        sourceStart = data[i].y1;
+
+      } else {
+        data[i].y0 = targetStart;
+        targetStart = data[i].y1;
+      }
+    }
+    return data;
+  } else if (type == "links") {
+
+  }
+}

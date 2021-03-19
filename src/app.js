@@ -1,4 +1,4 @@
-import {prepData, infoModal, deleteSelection} from './utils';
+import {prepData, infoModal, deleteSelection, fixSankeyYVals} from './utils';
 import {select, selectAll} from '../node_modules/d3-selection';
 import {axisLeft, axisBottom} from '../node_modules/d3-axis';
 import {csv, json, geoEqualEarth, geoPath, geoIdentity, 
@@ -223,15 +223,14 @@ export function mainDiagram(data, eins) {
   const keys = ["sponsor","state"]
   var graphData = graph(data, keys);
 
-  const color = scaleOrdinal()
-            .domain(eins)
-            .range(["#003f5c","#bdbdbd","#cd853f"]);
+  const color = ["#003f5c","#bdbdbd","#cd853f", "#003f5c"];
 
   const sankeyParams = sankey()
     .nodeSort(null)
     .linkSort(null)
-    .nodeWidth(4)
-    .nodePadding(20)
+    .nodeWidth(2)
+    // Node Padding breaks the chart if too large and nodes / width don't work.
+    .nodePadding(3)
     .extent([[0, 5], [width, height - 20]])
 
   const svg = select("#mapviz")
@@ -247,15 +246,17 @@ export function mainDiagram(data, eins) {
     links: graphData.links.map(d => Object.assign({}, d))
   });
 
-  console.log(nodes, links);
+  console.log(links);
+  const newNodes = fixSankeyYVals(nodes, "nodes");
+  const newLinks = fixSankeyYVals(links, "links");
 
   svg.append("g")
     .selectAll("rect")
-    .data(nodes)
+    .data(newNodes)
     .join("rect")
       .attr("x", d => d.x0)
-      .attr("y", d=> d.y1 - 5)
-      .attr("height", d=> 10)
+      .attr("y", d=> d.y0)
+      .attr("height", d => d.y1 - d.y0)
       .attr("width", d=> d.x1 - d.x0)
       .attr("transform", "translate(0," + margin.top + ")")
     .append("title")
@@ -267,30 +268,44 @@ export function mainDiagram(data, eins) {
     .data(links)
     .join("path")
     .attr("d", sankeyLinkHorizontal())
-    .attr("stroke", d => color(d.names[0]))
-    .attr("stroke-width", d => Number(d.value) / 900000 )
+    .attr("stroke", d => {
+      console.log(eins.indexOf(d.names[0]));
+      return color[eins.indexOf(d.names[0])];
+      })
+    .attr("stroke-width", d => d.width)
     .attr("transform", "translate(0," + margin.top + ")")
     .style("mix-blend-mode","multiply")
+    .on('mouseenter', (e, d) => {
+      tooltip
+            .style('display','block')
+            .style('left', `${e.offsetX + 220}px`)
+            .style('top', `${e.offsetY + 20}px`)
+            .text(d.target.name + ", $" + `${d.value.toLocaleString()}`);
+    })
+    .on('mouseleave', (e, d) =>
+      tooltip.style('display', 'none'));
 
-  svg.append("g")
-      .style("font", "10px sans-serif")
-    .selectAll("text")
-    .data(nodes)
-    .join("text")
-      .attr("id","text")
-      .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
-      .attr("y", d => d.x0 < width / 2 ? (d.y1 + d.y0) / 2 + 10 : (d.y1 + d.y0) / 2)
-      .attr("dy", "0.35em")
-      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-      .text(d => d.name)
-      .attr("transform", "translate(0," + margin.top + ")")
-      // Having trouble changing the color of the labels to have a background. 
-      // .attr('display','block')
-      // .style('fill','white')
-      // .style('background-color','#646464')
-    .append("tspan")
-      .attr("fill-opacity", 0.7)
-      .text(d => ` ${"$" + d.value.toLocaleString()}`);
+  const tooltip = select("#mapviz").append('div')
+                    .attr('id','tooltip')
+                    .attr("height", 4)
+                    .attr("width", 4)
+                    .style('display','none');
+
+//   svg.append("g")
+//       .style("font", "8px sans-serif")
+//     .selectAll("text")
+//     .data(newNodes)
+//     .join("text")
+//       .attr("id","text")
+//       .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+//       .attr("y", d => d.x0 < width / 2 ? (d.y1 + d.y0) / 2 + 10 : (d.y1 + d.y0) / 2)
+//       .attr("dy", "0.35em")
+//       .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+//       .text(d => d.name)
+//       .attr("transform", "translate(0," + margin.top + ")")
+//     .append("tspan")
+//       .attr("fill-opacity", 0.7)
+//       .text(d => ` ${"$" + d.value.toLocaleString()}`);
 }
 
 // Helper function to transform the data to the graph / links modal.

@@ -157,6 +157,15 @@ label {
   font-size: 12px;
   padding: 5px;
 }
+#tooltip {
+  position:absolute;
+  pointer-events: none;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 5px;
+}
 
 /* Stacked Area Chart CSS */
 #compviz {
