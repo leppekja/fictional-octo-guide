@@ -54,6 +54,7 @@ h2 {
   grid-template-areas: 
     'search map map map'
     'dafBoxes map map map'
+    'dafBoxes map map map'
     'dafBoxes percent1 percent2 percent3';    
   grid-column-gap: 10px;
   row-gap: 10px;
@@ -102,13 +103,13 @@ input[type=button] {
 label {
   display:block;
   font-size: 9px;
-  line-height: 8px;
+  line-height: 10px;
 }
 
 /* Map Visualization CSS */
 .map {
   grid-area: map;
-  max-height: fit-content;
+  /* max-height: 400px; */
   /* border: 2px solid orangered; */
 }
 
@@ -121,20 +122,21 @@ circle {
   max-width: 300px;
   padding: 5px;
   border-top:2px solid rgb(82, 82, 82);
+  border-bottom:2px solid rgb(82, 82, 82);
 }
 .percent2 {
   grid-area: percent2;
   max-width: 300px;
   padding: 5px;
   border-top:2px solid rgb(82, 82, 82);
-
+  border-bottom:2px solid rgb(82, 82, 82);
 }
 .percent3 {
   grid-area: percent3;
   max-width: 300px;
   padding: 5px;
   border-top:2px solid rgb(82, 82, 82);
-
+  border-bottom:2px solid rgb(82, 82, 82);
 }
 
 #tooltip {

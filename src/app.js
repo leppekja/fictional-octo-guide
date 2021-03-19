@@ -1,4 +1,4 @@
-import {prepData, infoModal, deleteSelection, updateData, updateData2} from './utils';
+import {prepData, infoModal, deleteSelection} from './utils';
 import {select, selectAll} from '../node_modules/d3-selection';
 import {axisLeft, axisBottom} from '../node_modules/d3-axis';
 import {csv, json, geoEqualEarth, geoPath, geoIdentity, 
@@ -7,29 +7,14 @@ import {csv, json, geoEqualEarth, geoPath, geoIdentity,
 import * as topojson from '../node_modules/topojson-client';
 import {scaleLinear, scaleBand, scaleOrdinal} from '../node_modules/d3-scale';
 import * as d3 from '../node_modules/d3';
+import {sankey, sankeyLinkHorizontal} from '../node_modules/d3-sankey';
 import * as dc3 from '../node_modules/d3-hierarchy';
 import './main.css';
 
-// Resources Consulted 
-// https://observablehq.com/@mbostock/u-s-airports-voronoi - Fill / stroke for background map
-// https://gist.github.com/michellechandra/0b2ce4923dc9b5809922 - AlbersUSA projection
+// Key Resources Consulted 
+// D3 Documentation on Observable / Github
 // https://medium.com/@louisemoxy/a-simple-way-to-make-d3-js-charts-svgs-responsive-7afb04bc2e4b - responsive design
-// https://stackoverflow.com/questions/20987535/plotting-points-on-a-map-with-d3 - transform lat/long points to projection
-
-// fetch('https://vega.github.io/vega-datasets/data/us-10m.json')
-//   .then(response => response.json())
-//   .then(data => myVis(data))
-//   .catch(e => {
-//     console.log(e);
-//   });
-// csv('../data/TestGeocodeToJson.csv')
-//     .then(data => {
-//         myVis(data);
-//       });
-
-// json('https://vega.github.io/vega-datasets/data/us-10m.json')
-//     .then(data => backgroundMap(data));
-
+// https://observablehq.com/@d3/parallel-sets
 /* 
 This is a global variable used to keep track of what data is being
 used in the info popups, and sent to dynamically update the bar chart. 
@@ -37,297 +22,56 @@ used in the info popups, and sent to dynamically update the bar chart.
 
 export var barChartData  = [undefined, undefined, undefined];
 
+// Read in the Sponsoring Organizations data for the dropdown menu
+// And to populate the info boxes and the bar charts
 
-json('https://vega.github.io/vega-datasets/data/us-10m.json')
-  .then(data => combined(data))
-  .then(initializeBars());
+csv('./data/SponsorsViz.csv')
+  .then(dafs => {
+    // DROPDOWN
+    var selecter = select("#dropdown")
+      .append("select")
+      .attr("id","DAFnames")
+      .on("change", function() {
+        var dafData = dafs[this.value];
+        if(this.value > 1) {
+          renderSupplement(dafData);
+        }
+      });
 
-function combined(data) {
-  var projection = geoAlbersUsa();
-  const states = topojson.feature(data, data.objects.states).features;
-  var svg = document.getElementById("mappoints")
-
-  // const zoom = zoom()
-  //   .scaleExtent([1, 8])
-  //   .on("zoom", zoomed);
-const margin ={top: 0, bottom: 0, right: 0, left: 150};
-
-const svgContainer = select('#mapviz')
-                        .append('div')
-                        .attr('class','chart-container')
-                        .style('position', 'relative')
-                        .style('overflow-x', 'hidden')
-                        .style('width','100%');
-
-var svg = svgContainer
-  .append('svg')
-  .attr('id', 'mappoints')
-  // .attr('height', '400px')
-  // .attr('width','400px')
-  .attr("viewBox", [0, 0, 1100, 500])
-  // .on("click", reset)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  svg.append('g')
-    .attr("id","states")
-    .selectAll('path')
-    .data(states)
-    .join('path')
-    .attr('d', geoPath().projection(projection))
-    .attr('fill','gray');
-    // .on("click", clicked);
-
-  svg.append("path")
-    .datum(topojson.mesh(data, data.objects.states, (a, b) => a !== b))
-    .attr("fill", "none")
-    .attr("stroke", "lightgray")
-    .attr("d", geoPath().projection(projection));
-  console.log("loading next");
-    // svg.call(zoom);
-
-  csv('./data/TestGeocodeToJson.csv')
-    .then(points => {
-      console.log('Data Loaded');
-      const points_margin ={top: -40, bottom: 0, right: 0, left: 100};
-      // DROPDOWN
-      var selecter = select("#dropdown")
-        .append("select")
-        .attr("id","DAFnames")
-        .on("change", function() {
-          var dafData = points[this.value];
-
-          if(this.value > 1) {
-            // infoModal(dafData);
-            renderSupplement(dafData);
-          }
-        });
-
-      selecter.append("option")
-        .html("Select DAF Sponsor:")
-        
-
-      var options = selecter.selectAll("null")
-        .data(points)
-        .enter()
-        .append("option")
-        .attr("value", function(d, i) { return i;})
-        .text(d => d.Name);
-
-      svg.append('g')
-      .selectAll('circle')
-      .data(points)
-      .join('circle')
-      .attr('r', 3)
-      .attr('transform', function(d) {
-        const [cx, cy] =  projection([
-          d.Longitude,
-          d.Latitude
-        ]);
-        return `translate(${cx}, ${cy})`;
-      })
-      .attr('fill','#003f5c')
-      .on('click', d => renderSupplement(d.target.__data__))
-      // infoModal(d.target.__data__);
-
-      .on('mouseenter', (e, d) => {
-        tooltip
-              .style('display','block')
-              .style('left', `${e.offsetX}px`)
-              .style('top', `${e.offsetY - 20}px`)
-              .text(d.EIN);
-        
-      })
-      .on('mouseleave', (e, d) =>
-        tooltip.style('display', 'none'));
-
-
-      const tooltip = svgContainer.append('div')
-                        .attr('id','tooltip')
-                        .style('display','none');
-
-  });
-}
-
-/*
-function myVis(data) {
-  const margin ={top: 0, bottom: 0, right: 0, left:100};
-  
-  var svg = select('#mapviz')
-  .append('svg')
-  .attr('id','mappoints')
-  .attr("viewBox", [0, 0, 1000, 600])
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // var svg = select('#mappoints')
-  //   .attr("viewBox", [0, 0, 1000, 600])
-  //   .append("g")
-  //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var projection = geoAlbersUsa();
-
-  svg.append('g')
-  .selectAll('circle')
-  .data(data)
-  .join('circle')
-  .attr('cx', d => d.Longitude)
-  .attr('cy', d => d.Latitude)
-  .attr('r', 3)
-  .attr('transform', function(d) {
-    return "translate(" + projection([
-      d.Longitude,
-      d.Latitude
-    ]) + ")"
+    selecter.append("option")
+      .html("Select DAF Sponsor:");
+      
+    var options = selecter.selectAll("null")
+      .data(dafs)
+      .enter()
+      .append("option")
+      .attr("value", function(d, i) { return i;})
+      .text(d => d.Name);
   })
-  .attr('d', geoPath().projection(geoAlbersUsa()))
-  .attr('fill','#003f5c');
+    .then(initializeBars());
 
-}
-
-
-function backgroundMap(statesJSON) {
-
-  const margin ={top: 50, bottom: 0, right: 0, left: 0};
-
-  const data = topojson.feature(statesJSON, statesJSON.objects.states).features;
-
-  // var svg = select('#mapviz')
-  //             .append('svg')
-  //             .attr('id', 'mappoints')
-  //             .attr("viewBox", [0, 0, 900, 500])
-  //             .append("g")
-  //             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var svg = select('#mappoints')
-              // .attr("viewBox", [0, 0, 1000, 600])
-              .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  svg.append('g')
-        .selectAll('path')
-        .data(data)
-        .join('path')
-        .attr('d', geoPath().projection(geoAlbersUsa()))
-        .attr('fill','gray')
-        // .attr("fill-opacity", .9)
-        .attr('stroke','gray');
-
-  svg.append("path")
-      .datum(topojson.mesh(statesJSON, statesJSON.objects.states, (a, b) => a !== b))
-      .attr("fill", "none")
-      .attr("stroke", "lightgray")
-      .attr("d", geoPath().projection(geoAlbersUsa()))
-}
-
-*/
-
-function updateMapColors(data) {
-
-  csv("./data/teststatevalues.csv")
-  .then(data => {
-
-  var colorMap = scaleLinear()
-            .domain([0, 100])
-            .range(["white","black"])
-            .interpolate(d3.interpolateHcl);
-  select("#states")
-    .selectAll("path").transition().duration(1000)
-    .attr("fill", d => colorMap(data[0][d.id]));
-    // .attr("fill", "blue");
-  });
-}
-
-
-
-// function displayGrantees(ein_filter) {
-//   var projection = geoAlbersUsa();
-//   const points_margin ={top: -30, bottom: 0, right: 0, left: 100};
-
-//   csv('../data/SVCFGeocodeResults.csv')
-//     .then(data => {
-
-//       svg.append('g')
-//       .attr("transform", "translate(" + points_margin.left + "," + points_margin.top + ")")
-//       .selectAll('circle')
-//       .data(points)
-//       .join('circle')
-//       .attr('cx', d => d.Longitude)
-//       .attr('cy', d => d.Latitude)
-//       .attr('r', 3)
-//       .attr('transform', function(d) {
-//         return "translate(" + projection([
-//           d.Longitude,
-//           d.Latitude
-//         ]) + ")"
-//       })
-//       .attr('d', geoPath().projection(projection))
-//       .attr('fill','#003f5c')
-//       .on('click', d => infoPopUp());
-//   });
-// }
-
-
-// function reset() {
-//   states.transition().style("fill", null);
-//   svg.transition().duration(750).call(
-//     zoom.transform,
-//     zoomIdentity,
-//     zoomTransform(svg.node()).invert([width / 2, height / 2])
-//   );
-// }
-
-// function clicked(event, d) {
-//   const [[x0, y0], [x1, y1]] = path.bounds(d);
-//   event.stopPropagation();
-//   states.transition().style("fill", null);
-//   select(this).transition().style("fill", "red");
-//   svg.transition().duration(750).call(
-//     zoom.transform,
-//     zoomIdentity
-//       .translate(width / 2, height / 2)
-//       .scale(Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
-//       .translate(-(x0 + x1) / 2, -(y0 + y1) / 2),
-//     pointer(event, svg.node())
-//   );
-// }
-
-// function zoomed(event) {
-//   const {transform} = event;
-//   g.attr("transform", transform);
-//   g.attr("stroke-width", 1 / transform.k);
-// }
-
-
-
-// STACKED AREA CHART CODE
-
-// csv('../data/TestGeocodeToJson.csv')
-//   .then(response => renderBarChart(response));
-
-
+// The functions to render the supplements
+// Calls all the functions when data changes
+// Called from above and in utils.js
 
 function renderSupplement(data) {
   var index_used = infoModal(data);
   data['index'] = index_used;
-  // if (index_used == 1) {
-  //   barChartData.unshift(data)
-  // } else if (index_used == 2) {
-  //     barChartData.splice(1, 0, data)
-  // } else if (index_used == 3) {
-  //   barChartData.push(data);
-  // };
   barChartData[index_used] = data;
-  updateMapColors(data);
-  barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts');
-  barChart(barChartData, 'DonorAdvisedFundsGrantsCnt', '#granted');
-  barChart(barChartData, 'DonorAdvisedFundsContriCnt', '#contributed');
-  // console.log(Object.entries(data).reduce((acc, row) => {acc = acc + Number(row.DonorAdvisedFundsHeldCnt); return acc;}, 0));
+  // Delete the old Sankey chart
+  // Will switch this to the D3 update cycle over spring break
+  document.getElementById("mapviz").innerHTML = '';
+  updateSankey(barChartData.map(d => d ? d.EIN : 0));
+  barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts', "Number of Accounts Held");
+  barChart(barChartData, 'DonorAdvisedFundsGrantsAmt', '#granted',"Amount Granted ($)");
+  barChart(barChartData, 'DonorAdvisedFundsContriAmt', '#contributed', "Amount Deposited ($)");
 }
 
+// Initializes the bar charts
+
 function initializeBars() {
-  const margin ={top: 5, bottom: 5, right: 20, left: 10};
-  const height = 200;
+  const margin ={top: 0, bottom: 10, right: 10, left: 10};
+  const height = 350;
   const width = 300;  
   const plotHeight = height - margin.top - margin.bottom;
   const plotWidth = width - margin.left - margin.right;
@@ -382,26 +126,38 @@ function initializeBars() {
   
 }
 
-export function barChart(data, yData, svgId) {
-  const margin ={top: 5, bottom: 5, right: 20, left: 10};
-  const height = 200;
+// Updates the bar charts
+
+export function barChart(data, yData, svgId, title) {
+  const margin ={top: 10, bottom: 10, right: 10, left: 10};
+  const height = 350;
   const width = 300;  
   const plotHeight = height - margin.top - margin.bottom;
   const plotWidth = width - margin.left - margin.right;
   var yDim = yData
   var svg = select(svgId);
 
+  svg.append("text")
+  .attr("x", 50)
+  .attr("y", 5)
+  .attr("dy", "0.35em")
+  .attr("font-size", '10px')
+  .text(title)
+
+
   var xScale =scaleBand()
   .domain(d3.range(data.length))
   .range([0, plotWidth])
   .padding(0.3);
 
+
   var yScale = scaleLinear()
-    .domain([0, 800])
-    .range([0, plotHeight]);
-
-
+    .domain([0, Math.max(...data.map(d => d ? Number(d[yDim]) : 0))])
+    .range([0, plotHeight])
+  
+  var yTicks = yScale.ticks().filter(tick => Number.isInteger(tick));
   const color = ["#cd853f","#555555","#cd853f","#003f5c"];
+
   svg.selectAll("rect")
       .data(data)
       .join(
@@ -410,7 +166,7 @@ export function barChart(data, yData, svgId) {
               .attr("y", d => d ? plotHeight - yScale(d[yDim]) : 0)
               .attr("width", xScale.bandwidth())
               .attr("height",d => d ? yScale(d[yDim]) : 0)
-              .attr("fill", (d, idx) => {console.log(color[idx], idx); return color[idx];}),
+              .attr("fill", (d, idx) => color[idx]),
         update => update.call(el => el)              
           .attr("x", (d, i) => xScale(i))
           .attr("y", d => d ? plotHeight - yScale(d[yDim]) : 0)
@@ -454,7 +210,7 @@ export function barChart(data, yData, svgId) {
   //       )
   //       .text(d => d.EIN)
 
-  svg.append('g').call(axisLeft(yScale.range([plotHeight, 0])))
+  svg.select('g').call(axisLeft(yScale.range([plotHeight, 0])).tickFormat(d3.format(".2s")).tickValues(yTicks))
       .attr('class','y-axis')
       .attr('transform',`translate(35, 0)`)
       .style('font-size', '9px');
@@ -485,131 +241,138 @@ export function barChart(data, yData, svgId) {
   //   .call(legend);
 
 }
-      
 
-// function updateBarChart(test, svg) {
-//   const margin ={top: 20, bottom: 20, right: 20, left: 10};
-//   const height = 300;
-//   const width = 300;  
-//   const plotHeight = height - margin.top - margin.bottom;
-//   const plotWidth = width - margin.left - margin.right;
+// Main Sankey Diagram code
+// Obtain the data
 
-//   const second = [{ "Type": "# of Accounts", "a": "330", "b": "330"},
-//                 { "Type": "$ Deposited", "a": "330", "b": "330"},
-//                 { "Type": "$ Granted", "a": "330", "b": "330"}]
+export function updateSankey(eins) {
+  csv('../data/check.csv')
+    .then(data => data.filter(row => eins.indexOf(row.sponsor) >= 0))
+    .then(filtered_data => mainDiagram(filtered_data, eins))
+}
 
-//   const groupBy = "Type";
-//   const valuesToPlot = Object.keys(test[0]).slice(1);
+// Draw diagram
+// Adapted from Mike Bostock Example on Observable
+// https://observablehq.com/@d3/parallel-sets
 
-//   var xGroupByScale = scaleBand()
-//   .domain(test.map(d => d[groupBy]))
-//   .rangeRound([margin.left, width-margin.right])
-//   .paddingInner(0.1);
+export function mainDiagram(data, eins) {
+  console.log(data);
+  const margin ={top: 10, bottom: 10, right: 10, left: 0};
+  const width =  1000;
+  const height = 500;
 
-// var xValuesToPlotScale =scaleBand()
-//   .domain(valuesToPlot)
-//   .range([0, xGroupByScale.bandwidth()])
-//   .padding(0.05);
+  const keys = ["sponsor","state"]
+  var graphData = graph(data, keys);
 
-// var yScale = scaleLinear()
-//   .domain([0, 603])
-//   .range([0, plotHeight]);
+  const color = scaleOrdinal()
+            .domain(eins)
+            .range(["#555555","#cd853f","#003f5c"]);
 
-// var color = scaleOrdinal()
-//   .range(["#98abc5", "#8a89a6"])
+  const sankeyParams = sankey()
+    .nodeSort(null)
+    .linkSort(null)
+    .nodeWidth(4)
+    .nodePadding(20)
+    .extent([[0, 5], [width, height - 5]])
 
-// const barContainer = svg.append('g').attr('class', 'bar-container')
+  const svg = select("#mapviz")
+                .append("svg")
+                // .attr("width", width)
+                // .attr("height", height)
+                .attr("transform", "translate(" + 
+                    margin.left + "," + margin.top + ")")
+                .attr("viewBox", [0,0, width, height]);
 
-//   barContainer.append("g")
-//       .selectAll("g")
-//       .data(test)
-//       .join("g")
-//         .attr("transform", test=> `translate(${xGroupByScale(test[groupBy])}, 0)`)
-//       .selectAll("rect")
-//       .data(test => valuesToPlot.map(key => ({key, value: test[key]})))
-//       .join(
-//         enter => enter.append("rect").attr("x", test => xValuesToPlotScale(test.key))
-//                                       .attr("y", test => plotHeight - yScale(test.value)),
-//         update => update.attr("x", test => xValuesToPlotScale(test.key))
-//                         .attr("y", test => plotHeight - yScale(test.value)),
-//         remove => remove.remove())
-//     //  .attr("x", test => xValuesToPlotScale(test.key))
-//     //  .attr("y", test => plotHeight - yScale(test.value))
-//       .attr("width", xValuesToPlotScale.bandwidth())
-//       .attr("height", test => yScale((test.value)))
-//       .attr("fill", d => color(d.key));
+  const {nodes, links} = sankeyParams({
+    nodes: graphData.nodes.map(d => Object.assign({}, d)),
+    links: graphData.links.map(d => Object.assign({}, d))
+  });
 
-//   svg.append('g').call(axisBottom(xGroupByScale))
-//       .attr('class','x-axis')
-//       .attr('transform',`translate(0, ${plotHeight})`)
-//       .style('font-size', '9px');
-//       // .attr('transform','rotate(-65)');
+  console.log(nodes, links);
 
-//   var legend = svg => {
-//     const g = svg
-//     .attr("transform", `translate(${width / 2}, 0)`)
-//     .attr("text-anchor","end")
-//     .selectAll("g")
-//     .data(color.domain().slice().reverse())
-//     .join("g")
-//     .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+  svg.append("g")
+    .selectAll("rect")
+    .data(nodes)
+    .join("rect")
+      .attr("x", d => d.x0)
+      .attr("y", d=> d.y1 - 5)
+      .attr("height", d=> 10)
+      .attr("width", d=> d.x1 - d.x0)
+      .attr("transform", "translate(0," + margin.top + ")")
+    .append("title")
+      .text(d => `${d.name}\n${d.value.toLocaleString()}`);
 
-//   g.append("rect")
-//     .attr("x", -19)
-//     .attr("width",19)
-//     .attr("height", 19)
-//     .attr("fill", color);
+  svg.append("g")
+    .attr("fill", "none")
+    .selectAll("g")
+    .data(links)
+    .join("path")
+    .attr("d", sankeyLinkHorizontal())
+    .attr("stroke", d => color(d.names[0]))
+    .attr("stroke-width", d => Number(d.value) / 1000000 )
+    .attr("transform", "translate(0," + margin.top + ")")
+    // .attr("stroke-width", 4)
+    .style("mix-blend-mode","multiply")
 
-//   g.append("text")
-//     .attr("x", -24)
-//     .attr("y", 9.5)
-//     .attr("dy", "0.35em")
-//     .attr(d => d);
-//   }
-//   svg.append("g")
-//     .call(legend);
-  
-// }
+  svg.append("g")
+      .style("font", "10px sans-serif")
+    .selectAll("text")
+    .data(nodes)
+    .join("text")
+      .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+      .attr("y", d => (d.y1 + d.y0) / 2)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+      .text(d => d.name)
+      .attr("transform", "translate(0," + margin.top + ")")
+    .append("tspan")
+      .attr("fill-opacity", 0.7)
+      .text(d => ` ${d.value.toLocaleString()}`);
+}
 
+// Helper function to transform the data to the graph / links modal.
+// ALL Credit to Mike Bostock
+// https://observablehq.com/@d3/parallel-sets
 
-// function biLink(root) {
-//   const map = new Map(root.leaves().map(d => [id]))
-// }
+export function graph(data, keys) {
+  let index = -1;
+  const nodes = [];
+  const nodeByKey = new Map;
+  const indexByKey = new Map;
+  const links = [];
 
-// const tree = dc3.cluster()
-//     .size([2 * Math.PI, 500])
-  
+  for (const k of keys) {
+    for (const d of data) {
+      const key = JSON.stringify([k, d[k]]);
+      if (nodeByKey.has(key)) continue;
+      const node = {name: d[k]};
+      nodes.push(node);
+      nodeByKey.set(key, node);
+      indexByKey.set(key, ++index);
+    }
+  }
 
-// d3.csv('./data/d2dtest.csv')
-//   .then(response => response)
-//   .then(data => console.log(data))
+  for (let i = 1; i < keys.length; ++i) {
+    const a = keys[i - 1];
+    const b = keys[i];
+    const prefix = keys.slice(0, i + 1);
+    const linkByKey = new Map;
+    for (const d of data) {
+      const names = prefix.map(k => d[k]);
+      const key = JSON.stringify(names);
+      const value = d.value || 1;
+      let link = linkByKey.get(key);
+      if (link) { link.value += value; continue; }
+      link = {
+        source: indexByKey.get(JSON.stringify([a, d[a]])),
+        target: indexByKey.get(JSON.stringify([b, d[b]])),
+        names,
+        value
+      };
+      links.push(link);
+      linkByKey.set(key, link);
+    }
+  }
 
-  // json('./data/daf2daf.json')
-//   .then(response => JSON.parse(response))
-//   .then(data => {
-//     const root = tree(dc3.hierarchy(data), d => d)
-
-//     console.log(root);
-
-//     const svg = select("#test")
-//       .append("svg")
-//       .attr('width', 800)
-//       .attr('height', 800)
-
-//     svg.append("g")
-//       .attr("font-family", "sans-serif")
-//       .attr("font-size", 10)
-//         .selectAll("g")
-//         .data(data.map(d =>))
-//         .join("g")
-//           .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
-//         .append("text")
-//           .attr("dy", "0.31em")
-//           .attr("x", d => d.x < Math.PI ? 6 : -6)
-//           .attr("text-anchor", d => d.x < Math.PI ? "start" : "end")
-//           .attr("transform", d => d.x >= Math.PI ? "rotate(180)" : null)
-//           .text(d => d.data.Name)
-//           .each(function(d) { d.text = this; })
-    
-//   });
-
+  return {nodes, links};
+}

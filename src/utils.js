@@ -1,5 +1,6 @@
 import {select, selectAll} from '../node_modules/d3-selection';
-import {barChart, barChartData} from './app';
+import {barChart, barChartData, updateSankey} from './app';
+
 export function infoModal(data) {
   var num_selected = 0;
   var index_used;
@@ -36,25 +37,19 @@ export function deleteSelection(element) {
   // Remove data from bar Chart
   // https://stackoverflow.com/questions/10003683/how-can-i-extract-a-number-from-a-string-in-javascript
   var index = element.replace(/[^0-9]/g, '');
-  // in case user removes out of order
 
   console.log(barChartData);
-
-  // if (barChartData.length == 1 && index > 1) {
-  //   if (index == 2) {
-  //     barChartData.splice(index - 2, 1);
-  //   } else {
-  //     barChartData.splice(index - 3, 1);
-  //   }
-  // } else {
-  //   barChartData.splice(index - 1, 1);
-  // }
   barChartData[index] = undefined;
 
+  // Delete the old Sankey chart
+  // Will switch this to the D3 update cycle over spring break
+  document.getElementById("mapviz").innerHTML = '';
+  updateSankey(barChartData.map(d => d ? d.EIN : 0));
+  
   // Re-render bar charts without the data
-  barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts');
-  barChart(barChartData, 'DonorAdvisedFundsGrantsCnt', '#granted');
-  barChart(barChartData, 'DonorAdvisedFundsContriCnt', '#contributed');
+  barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts', "Number of Accounts Held");
+  barChart(barChartData, 'DonorAdvisedFundsGrantsAmt', '#granted',"Amount Granted ($)");
+  barChart(barChartData, 'DonorAdvisedFundsContriAmt', '#contributed', "Amount Deposited ($)");
 }
 
 function writeDafDataToModal(element, index, data) {
@@ -75,9 +70,9 @@ function writeDafDataToModal(element, index, data) {
   
   name.innerText = data.Name;
   ein.innerText = "EIN: " + data.EIN;
-  numHeld.innerText = data.DonorAdvisedFundsHeldCnt + " Accounts Sponsored"
-  deposits.innerText = "$ " + data.DonorAdvisedFundsContriAmt + " Deposited"
-  grants.innerText = "$ " + data.DonorAdvisedFundsGrantsAmt + " Granted"
+  numHeld.innerText = data.DonorAdvisedFundsHeldCnt ? data.DonorAdvisedFundsHeldCnt + " Accounts Sponsored" : " 0 Accounts Sponsored"
+  deposits.innerText = data.DonorAdvisedFundsContriAmt ? "$ " + data.DonorAdvisedFundsContriAmt + " Deposited" : "$0 Deposited"
+  grants.innerText = data.DonorAdvisedFundsGrantsAmt ? "$ " + data.DonorAdvisedFundsGrantsAmt + " Granted" : "$0 Granted"
 
   element.appendChild(name);
   element.appendChild(ein);
@@ -93,38 +88,7 @@ function writeDafDataToModal(element, index, data) {
 
 }
 
-// export function enableSearch() {
-//   const searchBtn = document.getElementById("searchBtn");
-//   searchBtn.addEventListener('click', searchDafOnMap);
-// }
-
-// export function searchDafOnMap() {
-//   const searchText = document.getElementById("searchdaf");
-//   const searchValue = searchText.value;
-//   searchText.innerText = '';
-  
-//   const foundDaf = selectAll("circle")
-//                   .filter(function(d) { return d.EIN === 417});
-//   console.log(foundDaf);
-
-//   foundDaf.style("fill","orange");
-// }
-
-
-export function updateData(data) {
-  const name = data['Name'];
-  return Object.entries(data)
-    // Don't keep any of the values in this list
-    .filter(d => ['EIN','Name','Longitude','Latitude'].indexOf(d[0]) < 0)
-    .map(
-      function(row) {
-        var d = {'Type' : nameChange(row[0]),
-                  [name] : row[1]
-                };
-        return d;
-      }, []
-    );
-}
+// Change how column names are displayed
 
 function nameChange(d) {
   if (d === "DonorAdvisedFundsContriAmt") {
