@@ -81,8 +81,11 @@ function writeDafDataToModal(element, index, data) {
   element.appendChild(grants);
 
   // Clear selection from Dropdown, if any
-  var dropdownSelect = document.getElementById("dropdown");
-  dropdownSelect.firstChild.selectedIndex = "0";
+
+    var dropdownSelect = document.getElementById("dropdown");
+    if(dropdownSelect.firstChild) {
+      dropdownSelect.firstChild.selectedIndex = "0";
+    };
 
   icon.addEventListener('click', function () {deleteSelection(index) });
 

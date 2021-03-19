@@ -19,7 +19,6 @@ body {
 .contrast-font {
   font-size: 18px;
   font-family: 'Didact Gothic', Arial, sans-serif;
-  color: darkgree
 }
 
 h2 {
@@ -46,6 +45,13 @@ h2 {
 .nav a:hover {
   border-right: 1px solid whitesmoke;
   border-left: 1px solid whitesmoke;
+}
+
+#go {
+  color: white;
+  float: right;
+  padding-top: 9px;
+  padding-right: 5px;
 }
 
 /* Page Layout CSS */
@@ -109,37 +115,40 @@ label {
 /* Map Visualization CSS */
 .map {
   grid-area: map;
+  /* background-color: #646464;
+  border-radius: 4px solid #646464; */
   /* max-height: 400px; */
   /* border: 2px solid orangered; */
 }
 
-circle {
-  z-index: 100; 
+#info text {
+  z-index: 5;
 }
+
 
 .percent1 {
   grid-area: percent1;
   max-width: 300px;
-  padding: 5px;
+  padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
 }
 .percent2 {
   grid-area: percent2;
   max-width: 300px;
-  padding: 5px;
+  padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
 }
 .percent3 {
   grid-area: percent3;
   max-width: 300px;
-  padding: 5px;
+  padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
 }
 
-#tooltip {
+#text {
   position:absolute;
   pointer-events: none;
   background: black;
@@ -171,6 +180,7 @@ circle {
 h5 {
   line-height: .8em;
 }
+
 
 .daf_info3 {
   border-radius: 4px;

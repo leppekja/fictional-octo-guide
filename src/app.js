@@ -18,6 +18,7 @@ import './main.css';
 /* 
 This is a global variable used to keep track of what data is being
 used in the info popups, and sent to dynamically update the bar chart. 
+We start with sample data.
 */
 
 export var barChartData  = [undefined, undefined, undefined];
@@ -48,7 +49,15 @@ csv('./data/SponsorsViz.csv')
       .attr("value", function(d, i) { return i;})
       .text(d => d.Name);
   })
-    .then(initializeBars());
+    .then(initializeBars())
+    .then(renderSupplement({
+      "EIN": "416029402",
+      "Name": "THE MINNEAPOLIS FOUNDATION",
+      "DonorAdvisedFundsHeldCnt": "821",
+      "DonorAdvisedFundsContriAmt": "89488164",
+      "DonorAdvisedFundsGrantsAmt": "48722649",
+      "index": 0
+    }));
 
 // The functions to render the supplements
 // Calls all the functions when data changes
@@ -70,7 +79,7 @@ function renderSupplement(data) {
 // Initializes the bar charts
 
 function initializeBars() {
-  const margin ={top: 0, bottom: 10, right: 10, left: 10};
+  const margin ={top: 10, bottom: 10, right: 10, left: 10};
   const height = 350;
   const width = 300;  
   const plotHeight = height - margin.top - margin.bottom;
@@ -176,69 +185,11 @@ export function barChart(data, yData, svgId, title) {
           ,
         exit => exit.remove()
       )
-      // .attr("fill", d => color(d.EIN))
-      // .on('mouseenter', (e, d) => {
-      //   tooltip
-      //         .style('display','block')
-      //         .style('left', `${e.offsetX}px`)
-      //         .style('top', `${e.offsetY}px`)
-      //         .text(d.EIN);
-        
-      // })
-      // .on('mouseleave', (e, d) =>
-      //   tooltip.style('display', 'block'));
-
-      //   const tooltip = svg.append('div') // DIVS CAN't be children of svg
-      //                   .attr('id','tooltip')
-      //                   .style('display','block');
-
-  // svg.append('g')
-  //       .attr('font-size', 12)
-  //       .attr('fill', "white")
-  //       .selectAll('text')
-  //       .data(data, d => d.EIN)
-  //       .join(
-  //         enter => enter.append("text")
-  //         .attr("x", (d, i) => xScale(i))
-  //         .attr("y", d => plotHeight - yScale(d[yDim]))
-  //         .attr("dy", -4),
-  //         update => update.call(el => el)
-  //         .attr("x", (d, i) => xScale(i))
-  //         .attr("y", d => plotHeight - yScale(d[yDim]))
-  //         .attr("dy", "-.4em"),
-  //         exit => exit.remove()
-  //       )
-  //       .text(d => d.EIN)
 
   svg.select('g').call(axisLeft(yScale.range([plotHeight, 0])).tickFormat(d3.format(".2s")).tickValues(yTicks))
       .attr('class','y-axis')
       .attr('transform',`translate(35, 0)`)
       .style('font-size', '9px');
-
-  // var legend = svg => {
-  //     const g = svg
-  //     .attr("transform", `translate(30, 0)`)
-  //     .attr("text-anchor","end")
-  //     .selectAll("g")
-  //     .data(color.domain().slice())
-  //     .join("g")
-  //     .attr("transform", (d, i) => `translate(${i * 90}, 20)`);
-
-  // g.append("rect")
-  //   .attr("x", -19)
-  //   .attr("width",15)
-  //   .attr("height", 15)
-  //   .attr("fill", color);
-
-  // g.append("text")
-  //   .attr("x", -24)
-  //   .attr("y", 9.5)
-  //   .attr("dy", "0.35em")
-  //   .attr(d => d.Name);
-  // }
-
-  // svg.append("g")
-  //   .call(legend);
 
 }
 
@@ -257,23 +208,23 @@ export function updateSankey(eins) {
 
 export function mainDiagram(data, eins) {
   console.log(data);
-  const margin ={top: 10, bottom: 10, right: 10, left: 0};
+  const margin ={top: 5, bottom: 0, right: 10, left: 0};
   const width =  1000;
-  const height = 500;
+  const height = 550;
 
   const keys = ["sponsor","state"]
   var graphData = graph(data, keys);
 
   const color = scaleOrdinal()
             .domain(eins)
-            .range(["#555555","#cd853f","#003f5c"]);
+            .range(["#003f5c","#bdbdbd","#cd853f"]);
 
   const sankeyParams = sankey()
     .nodeSort(null)
     .linkSort(null)
     .nodeWidth(4)
     .nodePadding(20)
-    .extent([[0, 5], [width, height - 5]])
+    .extent([[0, 5], [width, height - 20]])
 
   const svg = select("#mapviz")
                 .append("svg")
@@ -281,7 +232,7 @@ export function mainDiagram(data, eins) {
                 // .attr("height", height)
                 .attr("transform", "translate(" + 
                     margin.left + "," + margin.top + ")")
-                .attr("viewBox", [0,0, width, height]);
+                .attr("viewBox", [0,0, width, height + 10]);
 
   const {nodes, links} = sankeyParams({
     nodes: graphData.nodes.map(d => Object.assign({}, d)),
@@ -309,9 +260,8 @@ export function mainDiagram(data, eins) {
     .join("path")
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke", d => color(d.names[0]))
-    .attr("stroke-width", d => Number(d.value) / 1000000 )
+    .attr("stroke-width", d => Number(d.value) / 900000 )
     .attr("transform", "translate(0," + margin.top + ")")
-    // .attr("stroke-width", 4)
     .style("mix-blend-mode","multiply")
 
   svg.append("g")
@@ -319,15 +269,20 @@ export function mainDiagram(data, eins) {
     .selectAll("text")
     .data(nodes)
     .join("text")
+      .attr("id","text")
       .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
-      .attr("y", d => (d.y1 + d.y0) / 2)
+      .attr("y", d => d.x0 < width / 2 ? (d.y1 + d.y0) / 2 + 10 : (d.y1 + d.y0) / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
       .text(d => d.name)
       .attr("transform", "translate(0," + margin.top + ")")
+      // Having trouble changing the color of the labels to have a background. 
+      // .attr('display','block')
+      // .style('fill','white')
+      // .style('background-color','#646464')
     .append("tspan")
       .attr("fill-opacity", 0.7)
-      .text(d => ` ${d.value.toLocaleString()}`);
+      .text(d => ` ${"$" + d.value.toLocaleString()}`);
 }
 
 // Helper function to transform the data to the graph / links modal.
