@@ -35,7 +35,7 @@ This is a global variable used to keep track of what data is being
 used in the info popups, and sent to dynamically update the bar chart. 
 */
 
-export var barChartData  = [];
+export var barChartData  = [undefined, undefined, undefined];
 
 
 json('https://vega.github.io/vega-datasets/data/us-10m.json')
@@ -224,7 +224,7 @@ function backgroundMap(statesJSON) {
 
 function updateMapColors(data) {
 
-  csv("../data/teststatevalues.csv")
+  csv("./data/teststatevalues.csv")
   .then(data => {
 
   var colorMap = scaleLinear()
@@ -310,15 +310,15 @@ function updateMapColors(data) {
 function renderSupplement(data) {
   var index_used = infoModal(data);
   data['index'] = index_used;
-  if (index_used == 1) {
-    barChartData.unshift(data)
-  } else if (index_used == 2) {
-      barChartData.splice(1, 0, data)
-  } else if (index_used == 3) {
-    barChartData.push(data);
-  }
+  // if (index_used == 1) {
+  //   barChartData.unshift(data)
+  // } else if (index_used == 2) {
+  //     barChartData.splice(1, 0, data)
+  // } else if (index_used == 3) {
+  //   barChartData.push(data);
+  // };
+  barChartData[index_used] = data;
   updateMapColors(data);
-  console.log(barChartData);
   barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts');
   barChart(barChartData, 'DonorAdvisedFundsGrantsCnt', '#granted');
   barChart(barChartData, 'DonorAdvisedFundsContriCnt', '#contributed');
@@ -400,25 +400,27 @@ export function barChart(data, yData, svgId) {
     .domain([0, 800])
     .range([0, plotHeight]);
 
-  var color = scaleOrdinal()
-    .range(["#003f5c","#cd853f","#555555"])
 
+  const color = ["#cd853f","#555555","#cd853f","#003f5c"];
   svg.selectAll("rect")
-      .data(data, d => d.EIN)
+      .data(data)
       .join(
         enter => enter.append("rect")
               .attr("x", (d, i) => xScale(i))
-              .attr("y", d => plotHeight - yScale(d[yDim]))
+              .attr("y", d => d ? plotHeight - yScale(d[yDim]) : 0)
               .attr("width", xScale.bandwidth())
-              .attr("height",d => yScale(d[yDim])),
+              .attr("height",d => d ? yScale(d[yDim]) : 0)
+              .attr("fill", (d, idx) => {console.log(color[idx], idx); return color[idx];}),
         update => update.call(el => el)              
           .attr("x", (d, i) => xScale(i))
-          .attr("y", d => plotHeight - yScale(d[yDim]))
+          .attr("y", d => d ? plotHeight - yScale(d[yDim]) : 0)
           .attr("width", xScale.bandwidth())
-          .attr("height",d => yScale(d[yDim])),
+          .attr("height",d => d ? yScale(d[yDim]) : 0)
+          .attr("fill", (d, idx) => color[idx])
+          ,
         exit => exit.remove()
       )
-      .attr("fill", d => color(d.index))
+      // .attr("fill", d => color(d.EIN))
       // .on('mouseenter', (e, d) => {
       //   tooltip
       //         .style('display','block')
@@ -430,7 +432,7 @@ export function barChart(data, yData, svgId) {
       // .on('mouseleave', (e, d) =>
       //   tooltip.style('display', 'block'));
 
-      //   const tooltip = svg.append('div')
+      //   const tooltip = svg.append('div') // DIVS CAN't be children of svg
       //                   .attr('id','tooltip')
       //                   .style('display','block');
 

@@ -170,7 +170,7 @@ h5 {
   line-height: .8em;
 }
 
-.daf_info1 {
+.daf_info3 {
   border-radius: 4px;
   padding: 5px;
   margin: 5px 5px 5px 10px;
@@ -181,7 +181,7 @@ h5 {
 
 }
 
-.daf_info1 h3 {
+.daf_info3 h3 {
   color: #003f5c;
   display: inline;
 }
@@ -202,7 +202,7 @@ h5 {
 }
 
 
-.daf_info3 {
+.daf_info1 {
   border-radius: 4px;
   padding: 5px;
   margin: 5px 5px 5px 10px;
@@ -212,8 +212,8 @@ h5 {
   border: 3px solid #555555;
 
 }
-.daf_info3 h3 {
-  color: #133813;
+.daf_info1 h3 {
+  color: #555555;
   display: inline;
 }
 

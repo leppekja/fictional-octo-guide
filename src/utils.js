@@ -37,15 +37,19 @@ export function deleteSelection(element) {
   // https://stackoverflow.com/questions/10003683/how-can-i-extract-a-number-from-a-string-in-javascript
   var index = element.replace(/[^0-9]/g, '');
   // in case user removes out of order
-  if (barChartData.length == 1 && index > 1) {
-    if (index == 2) {
-      barChartData.splice(index - 2, 1);
-    } else {
-      barChartData.splice(index - 3, 1);
-    }
-  } else {
-    barChartData.splice(index - 1, 1);
-  }
+
+  console.log(barChartData);
+
+  // if (barChartData.length == 1 && index > 1) {
+  //   if (index == 2) {
+  //     barChartData.splice(index - 2, 1);
+  //   } else {
+  //     barChartData.splice(index - 3, 1);
+  //   }
+  // } else {
+  //   barChartData.splice(index - 1, 1);
+  // }
+  barChartData[index] = undefined;
 
   // Re-render bar charts without the data
   barChart(barChartData, 'DonorAdvisedFundsHeldCnt', '#accounts');
