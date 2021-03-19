@@ -229,6 +229,16 @@ h5 {
   display: inline;
 }
 
+.daf_about {
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 5px 5px 10px;
+  background: whitesmoke;  
+  box-shadow: 0 4px 8px 0 white;
+  height: fit-content;
+
+}
+
 /* Footer CSS */
 
 footer {

@@ -9,7 +9,6 @@ Data is [available on AWS](https://aws.amazon.com/blogs/publicsector/irs-990-fil
 
 ## To Do
 
-- Fix bar chart title issue
 - Ensure main parallel chart does not go across boundaries
 - Fix parallel chart width and y0 y1 coordinate issues 
 - Fix colors on EIN / Grant amount indicators on the parallel chart to see better when colors are dark.

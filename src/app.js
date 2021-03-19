@@ -88,7 +88,7 @@ function initializeBars() {
   const accounts = select("#bar1")
         .append("svg")
         .attr("id","accounts")
-        .attr("viewBox", [0,0, plotWidth, plotHeight])
+        .attr("viewBox", [0,0, plotWidth, plotHeight + 10])
         .attr("transform", "translate(" + 
                         margin.left + "," + margin.top + ")")
         .append("g")
@@ -97,7 +97,7 @@ function initializeBars() {
   const granted = select("#bar2")
         .append("svg")
         .attr("id","granted")
-        .attr("viewBox", [0,0, plotWidth, plotHeight])
+        .attr("viewBox", [0,0, plotWidth, plotHeight + 10])
         .attr("transform", "translate(" + 
                         margin.left + "," + margin.top + ")")
         .append("g")
@@ -113,24 +113,30 @@ function initializeBars() {
         .attr("id","info");
 
   accounts.append("text")
-          .attr("x", 50)
-          .attr("y", 5)
+          .attr("text-anchor","end")
+          .attr("x", 0)
+          .attr("y", 50)
           .attr("dy", "0.35em")
           .attr("font-size", '10px')
+          .attr("transform", "rotate(-90)")
           .text("Number of Accounts Held")
 
   granted.append("text")
-          .attr("x", 50)
-          .attr("y", 5)
+          .attr("text-anchor","end")
+          .attr("x", 0)
+          .attr("y", 50)
           .attr("dy", "0.35em")
           .attr("font-size", '10px')
+          .attr("transform", "rotate(-90)")
           .text("Amount Granted ($)")
 
   contributed.append("text")
-          .attr("x", 50)
-          .attr("y", 5)
+          .attr("text-anchor","end")
+          .attr("x", 0)
+          .attr("y", 50)
           .attr("dy", "0.35em")
           .attr("font-size", '10px')
+          .attr("transform", "rotate(-90)")
           .text("Amount Deposited ($)")
   
 }
@@ -147,10 +153,12 @@ export function barChart(data, yData, svgId, title) {
   var svg = select(svgId);
 
   svg.append("text")
-  .attr("x", 50)
-  .attr("y", 5)
+  .attr("text-anchor","end")
+  .attr("x", 0)
+  .attr("y", 50)
   .attr("dy", "0.35em")
   .attr("font-size", '10px')
+  .attr("transform", "rotate(-90)")
   .text(title)
 
 
