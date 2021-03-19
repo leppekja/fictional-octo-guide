@@ -197,7 +197,7 @@ export function barChart(data, yData, svgId, title) {
 // Obtain the data
 
 export function updateSankey(eins) {
-  csv('../data/check.csv')
+  csv('./data/check.csv')
     .then(data => data.filter(row => eins.indexOf(row.sponsor) >= 0))
     .then(filtered_data => mainDiagram(filtered_data, eins))
 }
