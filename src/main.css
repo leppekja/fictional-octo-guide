@@ -323,6 +323,10 @@ footer {
   .search {
     max-width: 100%;
   }
+  
+  .topinfo {
+    max-width: 100%;
+  }
 
   .infoBoxes {
     max-width: 100%;
@@ -351,6 +355,7 @@ footer {
   .grid {
     grid-template-areas: 
       'search'
+      'topinfo'
       'map'
       'barsinfo'
       'percent1'
