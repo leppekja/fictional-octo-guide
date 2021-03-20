@@ -214,7 +214,7 @@ export function updateSankey(eins) {
 export function mainDiagram(data, eins) {
   const margin ={top: 5, bottom: 0, right: 10, left: 0};
   const width =  1000;
-  const height = 750;
+  const height = 600;
 
   const keys = ["sponsor","state"]
   var graphData = graph(data, keys);
@@ -274,7 +274,7 @@ export function mainDiagram(data, eins) {
       tooltip
             .style('display','block')
             .style('left', `${e.offsetX + 220}px`)
-            .style('top', `${e.offsetY + 20}px`)
+            .style('top', `${e.offsetY + 150}px`)
             .text(d.target.name + ", $" + `${d.value.toLocaleString()}`);
     })
     .on('mouseleave', (e, d) =>
