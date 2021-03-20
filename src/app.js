@@ -102,7 +102,7 @@ function initializeBars() {
   const contributed = select("#bar3")
         .append("svg")
         .attr("id","contributed")
-        .attr("viewBox", [0,0, plotWidth, plotHeight])
+        .attr("viewBox", [0,0, plotWidth, plotHeight + 10])
         .attr("transform", "translate(" + 
                         margin.left + "," + margin.top + ")")
         .append("g")

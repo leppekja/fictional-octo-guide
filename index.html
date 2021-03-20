@@ -44,11 +44,11 @@
         <div class="daf_info3" id="daf3">
           <h3>None Selected</h3>
         </div>
-        <div class="daf_about">
+        <div class="daf_about" id="daf_about">
           <h3>About</h3>
           <p>A donor-advised fund is like a bank account earmarked for donations while the funds appreciate.</p>
           <p>The flow diagram shows the amount of money donated from each donor advised fund selected to each state.</p>
-          <p><b>Number of Accounts Held</b> indicates how many accounts the sponsoring organization holds - do they serve many or few people?</p>
+          <p id='pb1'><b>Number of Accounts Held</b> indicates how many accounts the sponsoring organization holds - do they serve many or few people?</p>
           <p><b>Amount Granted</b> indicates how much money left the bank accounts in 2018 and went to nonprofits.</p>
           <p><b>Amount Deposited</b> indicates how much money people put in the accounts in 2018 - is money staying in the account or being distributed?</p>
           <p>These graphics visualize 2018 data sourced from <a href="https://docs.opendata.aws/irs-990/readme.html">IRS-990 Filings</a>.</p>
@@ -57,15 +57,26 @@
       <div class="map">
         <div id="mapviz"></div>
       </div>      
-      <div class="percent1" id="bar1">
+      <div class="percent1" id="bar1" onmouseover="highlight(7);" onmouseout="unhighlight(7);">
       </div>
-      <div class="percent2" id="bar2">
+      <div class="percent2" id="bar2"onmouseover="highlight(9);" onmouseout="unhighlight(9);">
       </div>
-      <div class="percent3" id="bar3">
+      <div class="percent3" id="bar3"onmouseover="highlight(11);" onmouseout="unhighlight(11);">
       </div>
 
     </div>
     <script src="bundle.js"></script>
+    <script>
+      function highlight(x) {
+        var e = document.getElementById('daf_about').childNodes[x];
+        e.setAttribute('style', 'font-weight:bold; background-color: lightgray');
+      }
+
+      function unhighlight(x) {
+        var e = document.getElementById('daf_about').childNodes[x];
+        e.setAttribute('style', 'font-weight: normal; text-shadow: none;');
+      }
+    </script>
     <noscript>
       <style type="text/css">
           .grid {display:none;}
@@ -73,7 +84,7 @@
       <div class="noscriptmsg">
       This visualization requires Javascript to be enabled. 
       </div>
-  </noscript>
+    </noscript>
 
   <div id="test"></div>
   </body>
