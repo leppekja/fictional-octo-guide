@@ -10,7 +10,7 @@ Data is [available on AWS](https://aws.amazon.com/blogs/publicsector/irs-990-fil
 ## To Do
 
 - Update/Exit cycle rather than innerHTML clear
-- Figure out why on occasion some of the data points don't work - see Network for Training and Development??
+- Figure out node padding and include state labels on the main flow diagram
 
 ## Credits
 

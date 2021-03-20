@@ -1,5 +1,5 @@
-import {select, selectAll} from '../node_modules/d3-selection';
 import {barChart, barChartData, updateSankey} from './app';
+import {csv} from '../node_modules/d3';
 
 export function infoModal(data) {
   var num_selected = 0;
@@ -38,7 +38,6 @@ export function deleteSelection(element) {
   // https://stackoverflow.com/questions/10003683/how-can-i-extract-a-number-from-a-string-in-javascript
   var index = element.replace(/[^0-9]/g, '');
 
-  console.log(barChartData);
   barChartData[index] = undefined;
 
   // Delete the old Sankey chart
@@ -54,6 +53,7 @@ export function deleteSelection(element) {
 
 function writeDafDataToModal(element, index, data) {
   element.innerHTML = '';
+  var EIN = data.EIN;
 
   var icon = document.createElement('i');
   icon.setAttribute('id','delete')
@@ -73,12 +73,25 @@ function writeDafDataToModal(element, index, data) {
   numHeld.innerText = data.DonorAdvisedFundsHeldCnt ? data.DonorAdvisedFundsHeldCnt + " Accounts Sponsored" : " 0 Accounts Sponsored"
   deposits.innerText = data.DonorAdvisedFundsContriAmt ? "$ " + data.DonorAdvisedFundsContriAmt + " Deposited" : "$0 Deposited"
   grants.innerText = data.DonorAdvisedFundsGrantsAmt ? "$ " + data.DonorAdvisedFundsGrantsAmt + " Granted" : "$0 Granted"
-
+  
   element.appendChild(name);
   element.appendChild(ein);
   element.appendChild(numHeld);
   element.appendChild(deposits);
   element.appendChild(grants);
+
+  // Check if any state-level data has been reported
+  csv('./data/check.csv')
+  .then(data => data.filter(row => [EIN].indexOf(row.sponsor) >= 0))
+  .then(filtered_data => { 
+    if (filtered_data.length == 0) {
+      var no_state = document.createElement('h5');
+      no_state.innerText = "No state-level data reported to map.";
+      element.appendChild(no_state);
+    }
+  })
+
+
 
   // Clear selection from Dropdown, if any
 

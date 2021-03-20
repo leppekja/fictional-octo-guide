@@ -1,14 +1,9 @@
-import {prepData, infoModal, deleteSelection, fixSankeyYVals} from './utils';
-import {select, selectAll} from '../node_modules/d3-selection';
-import {axisLeft, axisBottom} from '../node_modules/d3-axis';
-import {csv, json, geoEqualEarth, geoPath, geoIdentity, 
-    geoAlbersUsa, zoom, zoomIdentity, zoomTransform, pointer,
-    area, stack, stackOffsetExpand, max, range, domain} from '../node_modules/d3';
-import * as topojson from '../node_modules/topojson-client';
+import {infoModal, fixSankeyYVals} from './utils';
+import {select} from '../node_modules/d3-selection';
+import {axisLeft} from '../node_modules/d3-axis';
+import {csv, range, format} from '../node_modules/d3';
 import {scaleLinear, scaleBand, scaleOrdinal} from '../node_modules/d3-scale';
-import * as d3 from '../node_modules/d3';
 import {sankey, sankeyLinkHorizontal} from '../node_modules/d3-sankey';
-import * as dc3 from '../node_modules/d3-hierarchy';
 import './main.css';
 
 // Key Resources Consulted 
@@ -34,7 +29,8 @@ csv('./data/SponsorsViz.csv')
       .attr("id","DAFnames")
       .on("change", function() {
         var dafData = dafs[this.value];
-        if(this.value > 1) {
+
+        if(this.value >= 0) {
           renderSupplement(dafData);
         }
       });
@@ -163,7 +159,7 @@ export function barChart(data, yData, svgId, title) {
 
 
   var xScale =scaleBand()
-  .domain(d3.range(data.length))
+  .domain(range(data.length))
   .range([0, plotWidth])
   .padding(0.3);
 
@@ -194,7 +190,7 @@ export function barChart(data, yData, svgId, title) {
         exit => exit.remove()
       )
 
-  svg.select('g').call(axisLeft(yScale.range([plotHeight, 0])).tickFormat(d3.format(".2s")).tickValues(yTicks))
+  svg.select('g').call(axisLeft(yScale.range([plotHeight, 0])).tickFormat(format(".2s")).tickValues(yTicks))
       .attr('class','y-axis')
       .attr('transform',`translate(35, 0)`)
       .style('font-size', '9px');
@@ -207,7 +203,8 @@ export function barChart(data, yData, svgId, title) {
 export function updateSankey(eins) {
   csv('./data/check.csv')
     .then(data => data.filter(row => eins.indexOf(row.sponsor) >= 0))
-    .then(filtered_data => mainDiagram(filtered_data, eins))
+    .then(filtered_data => mainDiagram(filtered_data, eins)
+  )
 }
 
 // Draw diagram
@@ -215,7 +212,6 @@ export function updateSankey(eins) {
 // https://observablehq.com/@d3/parallel-sets
 
 export function mainDiagram(data, eins) {
-  console.log(data);
   const margin ={top: 5, bottom: 0, right: 10, left: 0};
   const width =  1000;
   const height = 550;
@@ -230,7 +226,8 @@ export function mainDiagram(data, eins) {
     .linkSort(null)
     .nodeWidth(2)
     // Node Padding breaks the chart if too large and nodes / width don't work.
-    .nodePadding(3)
+    // I don't understand why though still need to research this.
+    .nodePadding(2)
     .extent([[0, 5], [width, height - 20]])
 
   const svg = select("#mapviz")
@@ -246,7 +243,6 @@ export function mainDiagram(data, eins) {
     links: graphData.links.map(d => Object.assign({}, d))
   });
 
-  console.log(links);
   const newNodes = fixSankeyYVals(nodes, "nodes");
   const newLinks = fixSankeyYVals(links, "links");
 
@@ -269,7 +265,6 @@ export function mainDiagram(data, eins) {
     .join("path")
     .attr("d", sankeyLinkHorizontal())
     .attr("stroke", d => {
-      console.log(eins.indexOf(d.names[0]));
       return color[eins.indexOf(d.names[0])];
       })
     .attr("stroke-width", d => d.width)
@@ -291,21 +286,18 @@ export function mainDiagram(data, eins) {
                     .attr("width", 4)
                     .style('display','none');
 
-//   svg.append("g")
-//       .style("font", "8px sans-serif")
-//     .selectAll("text")
-//     .data(newNodes)
-//     .join("text")
-//       .attr("id","text")
-//       .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
-//       .attr("y", d => d.x0 < width / 2 ? (d.y1 + d.y0) / 2 + 10 : (d.y1 + d.y0) / 2)
-//       .attr("dy", "0.35em")
-//       .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-//       .text(d => d.name)
-//       .attr("transform", "translate(0," + margin.top + ")")
-//     .append("tspan")
-//       .attr("fill-opacity", 0.7)
-//       .text(d => ` ${"$" + d.value.toLocaleString()}`);
+  // svg.append("g")
+  //     .style("font", "8px sans-serif")
+  //   .selectAll("text")
+  //   .data(newNodes)
+  //   .join("text")
+  //     .attr("id","text")
+  //     .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+  //     .attr("y", d => d.x0 < width / 2 ? (d.y1 + d.y0) / 2 + 10 : (d.y1 + d.y0) / 2)
+  //     .attr("dy", "0.35em")
+  //     .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+  //     .text(d => d.name)
+  //     .attr("transform", "translate(0," + margin.top + ")")
 }
 
 // Helper function to transform the data to the graph / links modal.
