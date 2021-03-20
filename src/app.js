@@ -214,12 +214,12 @@ export function updateSankey(eins) {
 export function mainDiagram(data, eins) {
   const margin ={top: 5, bottom: 0, right: 10, left: 0};
   const width =  1000;
-  const height = 550;
+  const height = 750;
 
   const keys = ["sponsor","state"]
   var graphData = graph(data, keys);
 
-  const color = ["#003f5c","#bdbdbd","#cd853f", "#003f5c"];
+  const color = ["#003f5c","#555555","#cd853f", "#003f5c"];
 
   const sankeyParams = sankey()
     .nodeSort(null)

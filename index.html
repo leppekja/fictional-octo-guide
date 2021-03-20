@@ -34,6 +34,11 @@
 
         </div>
       </div>
+      <div class="topinfo">
+        <p>The flow diagram shows the amount of money donated from each donor advised fund selected to each state.</p>
+        <p>Grants flow from donor advised funds (on the left) to states (on the right). Hover over for more information.</p>
+
+      </div>
       <div class='infoBoxes'>
         <div class="daf_info1" id="daf1">
           <h3>None Selected</h3>
@@ -44,37 +49,40 @@
         <div class="daf_info3" id="daf3">
           <h3>None Selected</h3>
         </div>
-        <div class="daf_about" id="daf_about">
+        <div class="daf_about">
           <h3>About</h3>
           <p>A donor-advised fund is like a bank account earmarked for donations while the funds appreciate.</p>
-          <p>The flow diagram shows the amount of money donated from each donor advised fund selected to each state.</p>
-          <p id='pb1'><b>Number of Accounts Held</b> indicates how many accounts the sponsoring organization holds - do they serve many or few people?</p>
-          <p><b>Amount Granted</b> indicates how much money left the bank accounts in 2018 and went to nonprofits.</p>
-          <p><b>Amount Deposited</b> indicates how much money people put in the accounts in 2018 - is money staying in the account or being distributed?</p>
           <p>These graphics visualize 2018 data sourced from <a href="https://docs.opendata.aws/irs-990/readme.html">IRS-990 Filings</a>.</p>
-          <p>Why might numbers differ from Amount Granted and what is mapped on the state flow chart? Due to IRS reporting regulations, the aggregate amount reported here is only for a specific type of grant. Furthermore, organizations are not required to report individual grantees if the amount was less than $5,000. This means totals may differ.</p>
+          <p><b>Why might numbers differ from Amount Granted and what is mapped on the state flow chart?</b> Due to IRS reporting regulations, the aggregate amount reported here is only for a specific type of grant. Furthermore, organizations are not required to report individual grantees if the amount was less than $5,000. This means totals may differ.</p>
         </div>
       </div>
       <div class="map">
         <div id="mapviz"></div>
       </div>      
-      <div class="percent1" id="bar1" onmouseover="highlight(7);" onmouseout="unhighlight(7);">
+      <div class="bar_chart_desc">
+        <div class="flex_bars_container" id="bars_about">
+          <p><b>Number of Accounts Held</b> indicates how many accounts the sponsoring organization holds - do they serve many or few people?</p>
+          <p><b>Amount Granted</b> indicates how much money left the bank accounts in 2018 and went to nonprofits.</p>
+          <p><b>Amount Deposited</b> indicates how much money people put in the accounts in 2018 - is money staying in the account or being distributed?</p>
+        </div>
       </div>
-      <div class="percent2" id="bar2"onmouseover="highlight(9);" onmouseout="unhighlight(9);">
+      <div class="percent1" id="bar1" onmouseover="highlight(1);" onmouseout="unhighlight(1);">
       </div>
-      <div class="percent3" id="bar3"onmouseover="highlight(11);" onmouseout="unhighlight(11);">
+      <div class="percent2" id="bar2"onmouseover="highlight(3);" onmouseout="unhighlight(3);">
+      </div>
+      <div class="percent3" id="bar3"onmouseover="highlight(5);" onmouseout="unhighlight(5);">
       </div>
 
     </div>
     <script src="bundle.js"></script>
     <script>
       function highlight(x) {
-        var e = document.getElementById('daf_about').childNodes[x];
+        var e = document.getElementById('bars_about').childNodes[x];
         e.setAttribute('style', 'font-weight:bold; background-color: lightgray');
       }
 
       function unhighlight(x) {
-        var e = document.getElementById('daf_about').childNodes[x];
+        var e = document.getElementById('bars_about').childNodes[x];
         e.setAttribute('style', 'font-weight: normal; text-shadow: none;');
       }
     </script>

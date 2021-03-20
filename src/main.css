@@ -58,9 +58,10 @@ h2 {
 .grid {
   display: grid;
   grid-template-areas: 
-    'search map map map'
+    'search topinfo topinfo topinfo'
     'dafBoxes map map map'
     'dafBoxes map map map'
+    'dafBoxes barsinfo barsinfo barsinfo'
     'dafBoxes percent1 percent2 percent3';    
   grid-column-gap: 10px;
   row-gap: 10px;
@@ -125,10 +126,41 @@ label {
   z-index: 5;
 }
 
+.topinfo {
+  grid-area: topinfo;
+  border-radius: 4px;
+  padding: 1px;
+  margin: 5px 5px 5px 5px;
+  background: whitesmoke;  
+  box-shadow: 0 4px 8px 0 white;
+  height: fit-content;
+}
+
+/* bar chart areas */
+
+.bar_chart_desc {
+  grid-area: barsinfo;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 5px 5px 10px;
+  background: whitesmoke;  
+  box-shadow: 0 4px 8px 0 white;
+  height: fit-content;
+}
+
+.flex_bars_container {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex_bars_container p {
+  padding: 0px 5px 0px 5px;
+}
 
 .percent1 {
   grid-area: percent1;
   max-width: 300px;
+  max-height: 350;
   padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
@@ -136,6 +168,7 @@ label {
 .percent2 {
   grid-area: percent2;
   max-width: 300px;
+  max-height: 350;
   padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
@@ -143,6 +176,7 @@ label {
 .percent3 {
   grid-area: percent3;
   max-width: 300px;
+  max-height: 350;
   padding: 1px;
   border-top:2px solid rgb(82, 82, 82);
   border-bottom:2px solid rgb(82, 82, 82);
@@ -245,7 +279,7 @@ h5 {
   background: whitesmoke;  
   box-shadow: 0 4px 8px 0 white;
   height: fit-content;
-
+  line-height: 24px;
 }
 
 /* Footer CSS */
@@ -294,6 +328,14 @@ footer {
     max-width: 100%;
   }
 
+  .bar_chart_desc {
+    max-width: 100%;
+  }
+
+  .flex_bars_container {
+    flex-direction: column;
+  }
+
   .percent1 {
     max-width: 100%;
   }
@@ -310,6 +352,7 @@ footer {
     grid-template-areas: 
       'search'
       'map'
+      'barsinfo'
       'percent1'
       'percent2'
       'percent3'
